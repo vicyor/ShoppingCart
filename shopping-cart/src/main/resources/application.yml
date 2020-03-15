@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: shopping-cart
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+server:
+  port: 80
+  servlet:
+    context-path: shopping
