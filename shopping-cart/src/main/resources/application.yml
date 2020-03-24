@@ -5,7 +5,22 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://linux:3306/shopping?serverTimezone=GMT+8
 server:
   port: 80
   servlet:
     context-path: shopping
+dubbo:
+#  注册中心协议
+  registry:
+    protocol: zookeeper
+    address:  zookeeper://linux:2181
+#  rpc通信协议
+  protocol:
+    port: 20880
+    name: dubbo
+  monitor:
+    protocol: registry

@@ -2,27 +2,37 @@ package com.vicyor.application.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
- * 作者:姚克威
- * 时间:2020/3/15 20:50
+ * 用户购物车
  **/
 @Entity
 @Data
-@Table(schema = "shopping",name = "user_shopping_cart")
+@Table(schema = "shopping", name = "user_shopping_cart")
 public class UserShoppingCart {
     @Id
     //主键自增
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long SKUId;
+    //商品id
+    private Long skuId;
+    //用户id
+    private Long userId;
     //加入购物车的数量，多次加入会进行合并
     private Long count;
     //采购时间
     private Timestamp purchase;
     //勾选状态
-    private Byte selected;
+    private Integer selected;
+    @Transient
+    private Long stock;
+    public UserShoppingCart(Long skuId, Long userId, Long count, Timestamp purchase, Integer selected) {
+        this.skuId = skuId;
+        this.userId = userId;
+        this.count = count;
+        this.purchase = purchase;
+        this.selected = selected;
+    }
 }

@@ -1,0 +1,27 @@
+server:
+  port: 80
+  servlet:
+    context-path: shopping
+spring:
+  thymeleaf:
+    cache: false
+  cache:
+    type: redis
+  redis:
+    host: linux
+    database: 0
+    port: 6379
+  datasource:
+    url: jdbc:mysql://linux:3306/shopping?serverTimezone=UTC
+    username: root
+    password: vicyor123456
+dubbo:
+  protocol:
+    name: dubbo
+    port: 20880
+  registry:
+    protocol: zookeeper
+    address: zookeeper://linux:2181
+    prefix: dubbo
+  application:
+    name: main

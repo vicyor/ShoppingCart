@@ -93,4 +93,9 @@ value(hash)-> {"商品id":id,"count":2,"timestamp":123,"selected":false}
           2.订单模块下订单
           3.购物车模块清除购物信息
 ```
-
+#### url设计
+```
+1.未登录用户权限      /sku(r),/stock(r),/shoppingcart(rw)
+2.登录用户权限       /sku(r),/stock(rw),/shoppingcart(rw)
+3.管理员权限        /sku(rw),/stock(rw),/shoppingcart(rw)
+```
