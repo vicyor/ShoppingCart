@@ -1,0 +1,26 @@
+dubbo:
+  registry:
+    address: zookeeper://linux:2181
+    protocol: zookeeper
+  protocol:
+    port: 20882
+    name: dubbo
+  monitor:
+    protocol: zookeeper
+spring:
+  rabbitmq:
+    username: guest
+    password: guset
+    publisher-returns: true
+    listener:
+      direct:
+        acknowledge-mode: manual #客户端消息手动签收
+    host: linux
+    port: 5672
+  datasource:
+    url: jdbc:mysql://linux:3306/shopping?serverTimezone=UTC
+    username: root
+    password: vicyor123456
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect #默认使用myisam存储引擎,一条sql一个事务

@@ -15,6 +15,13 @@ spring:
     url: jdbc:mysql://linux:3306/shopping?serverTimezone=UTC
     username: root
     password: vicyor123456
+  rabbitmq:
+    host: linux
+    port: 5672
+    username: guest
+    password: guest
+    publisher-confirms: false  #生产者确认
+    publisher-returns: true    #生产者消息返回(未路由的消息)
 dubbo:
   protocol:
     name: dubbo

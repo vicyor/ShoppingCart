@@ -9,10 +9,14 @@ spring:
     username: root
     password: 123456
     url: jdbc:mysql://linux:3306/shopping?serverTimezone=GMT+8
-server:
-  port: 80
-  servlet:
-    context-path: shopping
+  rabbitmq:
+    port: 5672
+    host: localhost
+    listener:
+      direct:
+        acknowledge-mode:  manual
+    username: guest
+    password: guest
 dubbo:
 #  注册中心协议
   registry:
@@ -20,7 +24,7 @@ dubbo:
     address:  zookeeper://linux:2181
 #  rpc通信协议
   protocol:
-    port: 20880
+    port: 20883
     name: dubbo
   monitor:
     protocol: registry

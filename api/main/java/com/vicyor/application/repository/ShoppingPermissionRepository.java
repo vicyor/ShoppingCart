@@ -1,6 +1,6 @@
 package com.vicyor.application.repository;
 
-import com.vicyor.application.entity.ShoppingPermission;
+import com.vicyor.application.po.ShoppingPermission;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

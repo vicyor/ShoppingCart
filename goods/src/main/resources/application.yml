@@ -1,0 +1,11 @@
+dubbo:
+  application:
+    name: goods
+  registry:
+    protocol: zookeeper
+    address: zookeeper://linux:2181
+  monitor:
+    protocol: registry
+  protocol:
+    name: dubbo
+    port: 20881
