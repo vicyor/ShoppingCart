@@ -17,6 +17,7 @@ spring:
         acknowledge-mode: manual #客户端消息手动签收
     host: linux
     port: 5672
+    publisher-confirms: true
   datasource:
     url: jdbc:mysql://linux:3306/shopping?serverTimezone=UTC
     username: root

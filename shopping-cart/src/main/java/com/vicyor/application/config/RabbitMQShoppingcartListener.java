@@ -42,6 +42,8 @@ public class RabbitMQShoppingcartListener {
             //数据库操作失败，消息取消
             channel.basicNack(deliveryTag, false, true);
         }
+        //通过mq延迟队列实现订单过期自动删除功能
+
         channel.basicAck(deliveryTag, false);
     }
 }

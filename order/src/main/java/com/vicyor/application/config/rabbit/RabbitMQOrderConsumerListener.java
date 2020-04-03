@@ -5,12 +5,13 @@ import com.vicyor.application.dto.SKUOrderDTO;
 import com.vicyor.application.po.ShoppingOrder;
 import com.vicyor.application.service.OrderService;
 import org.springframework.amqp.rabbit.annotation.*;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -25,7 +26,8 @@ import java.util.Map;
 public class RabbitMQOrderConsumerListener {
     @Autowired
     private OrderService orderService;
-
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     @RabbitHandler
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = "order", durable = "true"),
@@ -37,16 +39,31 @@ public class RabbitMQOrderConsumerListener {
         List<SKUOrderDTO> dtos = (List<SKUOrderDTO>) order.get("data");
         Long userId = (Long) order.get("userId");
         String orderId = (String) order.get("id");
-        //对订单进行处理
         ShoppingOrder shoppingOrder = new ShoppingOrder(orderId, userId,
                 new Timestamp(System.currentTimeMillis()), 0);
         Long deliveryTag = Long.valueOf(headers.get(AmqpHeaders.DELIVERY_TAG).toString());
         try {
+            //将订单，订单与商品多对多表持久化
             orderService.handle(shoppingOrder, dtos);
         } catch (Exception e) {
             //数据库操作失败，消息取消
             channel.basicNack(deliveryTag, false, true);
+            throw e;
         }
+        //设置发送者重试机制
+        rabbitTemplate.setConfirmCallback(((correlationData, ack, casue) -> {
+            if(!ack){
+                String oId = correlationData.getId();
+                rabbitTemplate.convertAndSend("order-ttl","shopping.order.ttl",oId);
+            }
+        }));
+        //消费者对消息签收
         channel.basicAck(deliveryTag, false);
+        //data为发送失败时传递的上下文
+        CorrelationData data = new CorrelationData();
+        data.setId(orderId);
+        //将订单Id发往延迟队列
+        rabbitTemplate.convertAndSend("order-ttl","shopping.order.ttl",orderId,data);
+
     }
 }

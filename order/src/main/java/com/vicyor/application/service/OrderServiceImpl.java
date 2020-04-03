@@ -34,4 +34,10 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public void cancelOrderIfNecessary(String orderId) {
+        //如果订单还是未支付，则取消订单
+        shoppingOrderRepository.cancelOrderIfNecessary(orderId);
+    }
+
 }

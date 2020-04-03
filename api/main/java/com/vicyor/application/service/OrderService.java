@@ -8,4 +8,5 @@ import java.util.List;
 public interface OrderService {
     void handle(ShoppingOrder shoppingOrder, List<SKUOrderDTO> dtos);
 
+    void cancelOrderIfNecessary(String orderId);
 }
