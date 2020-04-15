@@ -4,6 +4,7 @@ import com.rabbitmq.client.Channel;
 import com.vicyor.application.dto.SKUOrderDTO;
 import com.vicyor.application.po.ShoppingOrder;
 import com.vicyor.application.service.OrderService;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -15,19 +16,21 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 作者:姚克威
- * 时间:2020/4/2 21:55
+ * 创建订单
  **/
 @Component
 public class RabbitMQOrderConsumerListener {
-    @Autowired
+    @Reference
     private OrderService orderService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
     @RabbitHandler
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = "order", durable = "true"),
@@ -36,9 +39,9 @@ public class RabbitMQOrderConsumerListener {
     ))
     public void onMessage(@Payload Map<String, Object> order, Channel channel, @Headers Map<String, Object> headers) throws IOException {
         //从消息payload中获取订单id，用户id,商品id,购买数量
-        List<SKUOrderDTO> dtos = (List<SKUOrderDTO>) order.get("data");
-        Long userId = (Long) order.get("userId");
-        String orderId = (String) order.get("id");
+        List dtos = (ArrayList) order.get("data");
+        Long userId = Long.valueOf(order.get("userId").toString());
+        String orderId = (String) order.get("orderId");
         ShoppingOrder shoppingOrder = new ShoppingOrder(orderId, userId,
                 new Timestamp(System.currentTimeMillis()), 0);
         Long deliveryTag = Long.valueOf(headers.get(AmqpHeaders.DELIVERY_TAG).toString());
@@ -50,20 +53,13 @@ public class RabbitMQOrderConsumerListener {
             channel.basicNack(deliveryTag, false, true);
             throw e;
         }
-        //设置发送者重试机制
-        rabbitTemplate.setConfirmCallback(((correlationData, ack, casue) -> {
-            if(!ack){
-                String oId = correlationData.getId();
-                rabbitTemplate.convertAndSend("order-ttl","shopping.order.ttl",oId);
-            }
-        }));
         //消费者对消息签收
         channel.basicAck(deliveryTag, false);
-        //data为发送失败时传递的上下文
-        CorrelationData data = new CorrelationData();
-        data.setId(orderId);
-        //将订单Id发往延迟队列
-        rabbitTemplate.convertAndSend("order-ttl","shopping.order.ttl",orderId,data);
-
+        String queue = "order-ttl";
+        Map<String, Object> data = new HashMap<>();
+        data.put("orderId", orderId);
+        data.put("userId", userId);
+        //将订单信息发往延迟队列
+        rabbitTemplate.convertAndSend(queue, "shopping.order.ttl", data);
     }
 }

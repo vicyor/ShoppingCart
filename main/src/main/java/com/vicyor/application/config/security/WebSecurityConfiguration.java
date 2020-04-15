@@ -1,6 +1,10 @@
 package com.vicyor.application.config.security;
 
+import com.vicyor.application.repository.ShoppingPermissionRepository;
+import com.vicyor.application.repository.ShoppingUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.RoleVoter;
@@ -12,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +25,16 @@ import java.util.List;
  * spring securty配置类
  **/
 @EnableWebSecurity
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter implements ApplicationContextAware {
     @Autowired
     UserDetailsService userDetailsService;
-
+    @Autowired
+    ApplicationContext applicationContext;
+    @Autowired
+    ShoppingPermissionRepository shoppingPermissionRepository;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                //添加一个实现动态url认证的过滤器
-                .addFilterAfter(dynamicallyUrlInterceptor(), FilterSecurityInterceptor.class)
                 .authorizeRequests()
                 //main服务器上的请求都需要认证
                 .anyRequest().authenticated()
@@ -44,7 +50,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 //csrf要求表单要有一个hidden域
-                .csrf().disable();
+                .csrf().disable()
+                //允许跨域
+                .cors().disable();
     }
 
     @Override
@@ -60,17 +68,5 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return encoder;
     }
 
-    @Bean
-    public DynamicallyUrlInterceptor dynamicallyUrlInterceptor() {
-        DynamicallyUrlInterceptor interceptor = new DynamicallyUrlInterceptor();
-        interceptor.setSecurityMetadataSource(new ShoppingFilterInvocationSecurityMetadataSource());
-        //配置RoleVoter决策
-        //RoleVoter => 判断url的角色是否包含用户的角色o(N*N)
-        List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
-        decisionVoters.add(new RoleVoter());
-        //设置认证决策管理器
-        interceptor.setAccessDecisionManager(new DynamicallyUrlAccessDecisionManager(decisionVoters));
-        return interceptor;
-    }
 }
 

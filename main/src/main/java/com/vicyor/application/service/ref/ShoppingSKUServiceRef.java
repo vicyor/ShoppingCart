@@ -5,22 +5,34 @@ import com.vicyor.application.service.ShoppingSKUService;
 import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 作者:姚克威
- * 时间:2020/3/24 19:29
+ * 时间:2020/4/5 13:42
  **/
-@Service
+@Service("shoppingSKUServiceRef")
 public class ShoppingSKUServiceRef implements ShoppingSKUService {
     @Reference
-   private ShoppingSKUService shoppingSKUService;
+    private ShoppingSKUService ref;
 
     @Override
     public Long getStockOfSKU(Long skuId) {
-        return shoppingSKUService.getStockOfSKU(skuId);
+        return ref.getStockOfSKU(skuId);
     }
 
     @Override
     public ShoppingSKU getSKUBySKUId(Long skuId) {
-        return shoppingSKUService.getSKUBySKUId(skuId);
+        return ref.getSKUBySKUId(skuId);
+    }
+
+    @Override
+    public Boolean countDownSKUStock(Long skuId, Long count) {
+        return ref.countDownSKUStock(skuId, count);
+    }
+
+    @Override
+    public void restoreGoodsStock(String orderId, List shoppingOrderSKUS) throws Exception {
+        ref.restoreGoodsStock(orderId, shoppingOrderSKUS);
     }
 }

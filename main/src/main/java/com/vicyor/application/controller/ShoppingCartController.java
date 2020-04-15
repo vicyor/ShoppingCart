@@ -1,12 +1,15 @@
 package com.vicyor.application.controller;
 
 import com.vicyor.application.common.GeneralResponseObject;
+import com.vicyor.application.dto.PurchaseDTO;
 import com.vicyor.application.po.ShoppingUser;
+import com.vicyor.application.po.TemporaryShoppingCart;
 import com.vicyor.application.po.UserShoppingCart;
 import com.vicyor.application.service.ShoppingSKUService;
 import com.vicyor.application.service.UserShoppingCartService;
 import com.vicyor.application.util.ShoppingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +27,10 @@ import java.util.List;
 @RequestMapping("/cart")
 public class ShoppingCartController {
     @Autowired
+    @Qualifier("userShoppingCartServiceRef")
     private UserShoppingCartService userShoppingCartService;
     @Autowired
+    @Qualifier("shoppingSKUServiceRef")
     private ShoppingSKUService shoppingSKUService;
 
     @PostMapping("/purchase")
@@ -36,27 +41,53 @@ public class ShoppingCartController {
      * 2.购物车模块加购
      */
     public GeneralResponseObject addPurchase(
-            @RequestParam("skuId") Long skuId,
-            @RequestParam("count") Long count
+            @RequestBody List<PurchaseDTO> purchaseDTOList
     ) {
         //获取登录用户
-        ShoppingUser user= ShoppingUtil.getShoppingUser();
-        Long userId = user.getUserId();
+        ShoppingUser user = ShoppingUtil.getShoppingUser();
+        Long userId = user != null ? user.getId() : -1;
         //构造返回对象
         GeneralResponseObject response = null;
-        //获取商品库存
-        Long skuCount = shoppingSKUService.getStockOfSKU(skuId);
-        if (skuCount - count < 0) {
-            response = new GeneralResponseObject(500, null, "商品数量不足");
-        } else {
-            //架构时间
-            Timestamp purchase = new Timestamp(System.currentTimeMillis());
-            //存储购物车数据
-            UserShoppingCart userShoppingCart = new UserShoppingCart(skuId, userId, count, purchase, 0);
-            userShoppingCartService.saveUserShoppingCart(userShoppingCart);
-            //构造响应对象,将购物车实例返回
+        List cartList = new ArrayList();
+        boolean success = true;
+        for (PurchaseDTO dto : purchaseDTOList) {
+            Long skuId = dto.getSkuId();
+            Long count = dto.getCount();
+            //获取商品库存
+            Long skuCount = shoppingSKUService.getStockOfSKU(skuId);
+            if (skuCount - count < 0) {
+                response = new GeneralResponseObject(500, null, "商品数量不足");
+                success = false;
+                break;
+            } else {
+                //架构时间
+                Timestamp purchase = new Timestamp(System.currentTimeMillis());
+                UserShoppingCart userShoppingCart = new UserShoppingCart(skuId, userId, count, purchase, 0);
+                TemporaryShoppingCart temporaryShoppingCart = new TemporaryShoppingCart(skuId, count, purchase, 0);
+                //存储购物车数据
+                if (user != null) {
+                    try {
+                        userShoppingCartService.saveUserShoppingCart(userShoppingCart);
+                    } catch (Exception e) {
+                        return new GeneralResponseObject(500,null,"加购出现错误");
+                    }
+                    cartList.add(userShoppingCart);
+                } else {
+                    cartList.add(temporaryShoppingCart);
+                }
+            }
+        }
+        if (!success) {
+            return response;
+        }
+        if (user != null) {
             response = new GeneralResponseObject(200, new ArrayList() {{
-                add(userShoppingCart);
+                add(cartList);
+            }}, "加入购物车成功");
+        } else {
+            //未登录
+            response = new GeneralResponseObject(200, new ArrayList() {{
+                add(cartList);
             }}, "加入购物车成功");
         }
         return response;

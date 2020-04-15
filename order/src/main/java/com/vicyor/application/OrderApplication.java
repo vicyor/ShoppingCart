@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  **/
 @SpringBootApplication
 @EnableDubbo
-@EnableJpaRepositories(basePackages = "com.vicyor.application.repository")
+@EnableJpaRepositories(transactionManagerRef = "jpaTransactionManager",basePackages = "com.vicyor.application.repository")
 @EnableRabbit
 public class OrderApplication {
     public static void main(String[] args) {

@@ -33,7 +33,7 @@ public class ShoppingUserDetailService implements UserDetailsService {
             List<ShoppingRole> roles = shoppingUser.getRoles();
             //将角色封装成Authority
             List<SimpleGrantedAuthority> authorities = roles.stream().map(
-                    role -> new SimpleGrantedAuthority( role.getRoleName())
+                    role -> new SimpleGrantedAuthority( role.getRolename())
             ).collect(Collectors.toList());
             user = new User(shoppingUser.getUsername(), shoppingUser.getPassword(), authorities);
         }

@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: shopping-cart
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.MySQLDialect
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://linux:3306/shopping?serverTimezone=UTC
+  rabbitmq:
+    port: 5672
+    host: linux
+    listener:
+      direct:
+        acknowledge-mode:  manual
+      simple:
+        acknowledge-mode: manual
+    username: guest
+    password: guest
+dubbo:
+#  注册中心协议
+  registry:
+    protocol: zookeeper
+    address:  zookeeper://linux:2181
+#  rpc通信协议
+  protocol:
+    port: 20883
+    name: dubbo
+  monitor:
+    protocol: registry
+  application:
+    name: shopping-cart

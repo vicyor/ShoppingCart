@@ -1,6 +1,5 @@
 package com.vicyor.application.service.ref;
 
-import com.vicyor.application.po.TemporaryShoppingCart;
 import com.vicyor.application.po.UserShoppingCart;
 import com.vicyor.application.service.UserShoppingCartService;
 import org.apache.dubbo.config.annotation.Reference;
@@ -10,9 +9,9 @@ import java.util.List;
 
 /**
  * 作者:姚克威
- * 时间:2020/3/16 15:21
+ * 时间:2020/4/5 13:37
  **/
-@Service
+@Service("userShoppingCartServiceRef")
 public class UserShoppingCartServiceRef implements UserShoppingCartService {
     @Reference
     UserShoppingCartService userShoppingCartService;
@@ -27,8 +26,19 @@ public class UserShoppingCartServiceRef implements UserShoppingCartService {
         return userShoppingCartService.getShoppingCartsByUserId(userId);
     }
 
+
     @Override
-    public void mergeTemporaryShoppingCart(Long principal, List<TemporaryShoppingCart> temporaryShoppingCarts) {
-        userShoppingCartService.mergeTemporaryShoppingCart(principal, temporaryShoppingCarts);
+    public void mergeTemporaryShoppingCart(Long userId, List temporaryShoppingCarts) {
+        userShoppingCartService.mergeTemporaryShoppingCart(userId, temporaryShoppingCarts);
+    }
+
+    @Override
+    public void deCreaseTheCountOfUserShoppingCart(Long userId, List dtos) {
+        userShoppingCartService.deCreaseTheCountOfUserShoppingCart(userId, dtos);
+    }
+
+    @Override
+    public void restoreUserShoppingCart(Long userId, List shoppingOrderSKUS) {
+        userShoppingCartService.restoreUserShoppingCart(userId,shoppingOrderSKUS);
     }
 }

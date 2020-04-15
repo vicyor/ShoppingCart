@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试登录页</title>
+</head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+自定义表单验证:
+<form action="/shopping/login" method="post">
+    <br/>
+    用户名:
+    <input type="text" name="username" placeholder="name"><br/>
+    密码:
+    <input type="password" name="password" placeholder="password"><br/>
+    <input type="hidden" id="temporaryShoppingCart" name="temporaryShoppingCart"/>
+    <input name="submit" type="submit" value="提交">
+</form>
+<script>
+    window.onload = function () {
+        //测试
+        localStorage.clear();
+        var temporaryShoppingCart = [
+            {"skuId": 1, "count": 10, "purchase": Date.parse(new Date()),"selected":0},
+            {"skuId": 2, "count": 5, "purchase": Date.parse(new Date()),"selected":0 }
+        ];
+        localStorage.setItem("temporaryShoppingCart",temporaryShoppingCart);
+        document.getElementById("temporaryShoppingCart").value=JSON.stringify(temporaryShoppingCart);
+    };
+</script>
+</body>
+</html>

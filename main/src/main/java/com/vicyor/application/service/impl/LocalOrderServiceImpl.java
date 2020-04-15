@@ -10,6 +10,7 @@ import com.vicyor.application.service.ShoppingSKUService;
 import com.vicyor.application.util.ShoppingUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.*;
 @Service
 public class LocalOrderServiceImpl implements LocalOrderService {
     @Autowired
+    @Qualifier("shoppingSKUServiceRef")
     private ShoppingSKUService shoppingSKUService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -53,11 +55,10 @@ public class LocalOrderServiceImpl implements LocalOrderService {
     @Transactional(transactionManager = "rabbitTransactionManager", rollbackFor = Exception.class)
     @Override
     public void executeCreateOrderTask(List<SKUOrderDTO> dtos) throws Exception {
-        List<Long> skuIdList = new ArrayList<>();
-        //进行减库存操作
         for (SKUOrderDTO dto : dtos) {
             Boolean updateResult = true;
             try {
+                //减库存
                 updateResult = shoppingSKUService.countDownSKUStock(dto.getSkuId(), dto.getCount());
                 if (!updateResult) {
                     //减库存失败抛出异常回滚
@@ -67,20 +68,19 @@ public class LocalOrderServiceImpl implements LocalOrderService {
                 //SqlException 回滚
                 throw e;
             }
-            skuIdList.add(dto.getSkuId());
         }
 
         //发送创建订单信息
         Map<String, Object> order = new HashMap<>();
         order.put("data", dtos);
-        order.put("userId", ShoppingUtil.getShoppingUser().getUserId());
-        order.put("id", UUID.randomUUID());
+        order.put("userId", ShoppingUtil.getShoppingUser().getId());
+        order.put("orderId", UUID.randomUUID());
         rabbitTemplate.convertAndSend("order", "shopping.order.create", order);
 
         //发送清除购物车信息
         Map<String, Object> shoppingCart = new HashMap<>();
-        shoppingCart.put("data", skuIdList);
-        shoppingCart.put("userId", ShoppingUtil.getShoppingUser().getUserId());
+        shoppingCart.put("data", dtos);
+        shoppingCart.put("userId", ShoppingUtil.getShoppingUser().getId());
         rabbitTemplate.convertAndSend("shopping-cart", "shopping.shoppingcart.empty", shoppingCart);
     }
 }

@@ -3,12 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>framework</artifactId>
-        <groupId>com.vicyor</groupId>
+        <artifactId>application</artifactId>
+        <groupId>com.vicyor.application</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <groupId>com.vicyor.application</groupId>
     <artifactId>goods</artifactId>
     <properties>
         <api.version>1.0-SNAPSHOT</api.version>
@@ -27,9 +27,9 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.vicyor</groupId>
+            <groupId>com.vicyor.application</groupId>
             <artifactId>api</artifactId>
-            <version>${api.version}</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.dubbo</groupId>
@@ -43,6 +43,15 @@
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
         </dependency>
-    </dependencies>
 
+    </dependencies>
+    <!-- spring boot 打包插件-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
