@@ -3,8 +3,7 @@ package com.vicyor.application.dto;
 import lombok.Data;
 
 /**
- * 作者:姚克威
- * 时间:2020/4/6 20:21
+ * 前端加购传递对象
  **/
 @Data
 public class PurchaseDTO {

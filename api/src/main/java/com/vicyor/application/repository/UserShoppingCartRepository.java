@@ -11,9 +11,30 @@ import java.util.Optional;
 
 public interface UserShoppingCartRepository extends JpaRepository<UserShoppingCart,Long> {
     List<UserShoppingCart> findAllByUserIdEquals(Long userId);
-    @Modifying
-    @Query(nativeQuery = true,value = "update user_shopping_cart set count =count - ?3 where user_id =?1 and sku_id = ?2  ")
-    void updateUserShoppingCart(Long userId, Long skuId,Long count);
 
-    Optional<UserShoppingCart> findOneByUserIdEqualsAndSkuIdEquals(Long userId, Long skuId);
+    Optional<UserShoppingCart> findOneByUserIdEqualsAndShoppingSKU_SkuIdEquals(Long userId, Long skuId);
+
+    /**
+     * 加购若商品已存在则添加其数量
+     */
+    @Modifying
+    @Query(nativeQuery = true,value = "update user_shopping_cart set  count = count + ?3  where user_id = ?1 and sku_id = ?2")
+    void addUserShoppingCart(Long userId, Long skuId, Long count);
+
+    /**
+     * 订单取消恢复用户购物车
+     * @param userId
+     * @param skuId
+     * @param count
+     */
+    @Modifying
+    @Query(nativeQuery = true,value = "update user_shopping_cart set count =count + ?3 where user_id =?1 and sku_id =?2")
+    void restoreUserShoppingCart(Long userId, Long skuId, Long count);
+
+    /**
+     * 前端手动更新用户购物车
+     */
+    @Modifying
+    @Query(nativeQuery = true,value = "update user_shopping_cart set count =?2,selected=?3 where id =?1")
+    void updateUserShoppingCart(Long id, Long count, Integer selected);
 }

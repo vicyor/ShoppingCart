@@ -31,7 +31,14 @@ public class ShoppingSKU implements Serializable {
     private Long stock;
     //商品版本
     private Long version;
+    //商品图片
+    private String imgUrl;
+    //商品描述
+    private String goodsDescription;
     protected ShoppingSKU(){
 
+    }
+    public ShoppingSKU(long skuId){
+        this.skuId=skuId;
     }
 }

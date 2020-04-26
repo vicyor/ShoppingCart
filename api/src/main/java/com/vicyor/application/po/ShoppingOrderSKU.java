@@ -18,13 +18,14 @@ public class ShoppingOrderSKU implements Serializable {
     private Long id;
     @Column(name = "order_id")
     private String orderId;
-    @Column(name = "sku_id")
-    private Long skuId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sku_id",referencedColumnName = "sku_id")
+    private ShoppingSKU shoppingSKU;
     private Long count;
 
-    public ShoppingOrderSKU(String orderId, Long skuId, Long count) {
+    public ShoppingOrderSKU(String orderId, ShoppingSKU shoppingSKU, Long count) {
         this.orderId = orderId;
-        this.skuId = skuId;
+        this.shoppingSKU = shoppingSKU;
         this.count = count;
     }
     protected ShoppingOrderSKU(){

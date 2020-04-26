@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * AbstractUserDetailsAuthenticationProvider - UsernamePasswordAuthenticationToken
+ * 用户名密码方式登录
  **/
 @Component
 public class ShoppingUserDetailService implements UserDetailsService {

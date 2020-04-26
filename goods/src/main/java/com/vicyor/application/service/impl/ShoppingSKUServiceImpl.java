@@ -7,9 +7,14 @@ import com.vicyor.application.repository.ShoppingSKURepository;
 import com.vicyor.application.service.ShoppingSKUService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 作者:姚克威
@@ -47,10 +52,19 @@ public class ShoppingSKUServiceImpl implements ShoppingSKUService {
             String json = mapper.writeValueAsString(map);
             ShoppingOrderSKU sku = mapper.readValue(json, ShoppingOrderSKU.class);
             Long restoreCount = sku.getCount();
-            Long skuId = sku.getSkuId();
+            Long skuId = sku.getShoppingSKU().getSkuId();
             System.err.println(skuId);
             repository.updateSKUStockRightly(skuId, restoreCount * -1);
         }
+    }
+
+    @Override
+    public Map<String, Object> getSkus(Integer from, Integer size) {
+        Page<ShoppingSKU> page = repository.findAll(PageRequest.of(from, size));
+        Map<String,Object> skus=new HashMap<>();
+        skus.put("skus",page.getContent());
+        skus.put("total",page.getTotalElements());
+        return skus;
     }
 
 }

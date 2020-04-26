@@ -6,6 +6,7 @@ import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 作者:姚克威
@@ -34,5 +35,10 @@ public class ShoppingSKUServiceRef implements ShoppingSKUService {
     @Override
     public void restoreGoodsStock(String orderId, List shoppingOrderSKUS) throws Exception {
         ref.restoreGoodsStock(orderId, shoppingOrderSKUS);
+    }
+
+    @Override
+    public Map<String, Object> getSkus(Integer from, Integer size) {
+        return ref.getSkus(from,size);
     }
 }

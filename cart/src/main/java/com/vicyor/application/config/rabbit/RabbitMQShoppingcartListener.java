@@ -36,7 +36,7 @@ public class RabbitMQShoppingcartListener {
         List dtoList = (ArrayList) shoppingCartMap.get("data");
         Long deliveryTag = Long.valueOf(headers.get(AmqpHeaders.DELIVERY_TAG).toString());
         try {
-            //用户购物车减库存
+            //用户购物车减count
             userShoppingCartService.deCreaseTheCountOfUserShoppingCart(userId, dtoList);
         } catch (Exception ex) {
             //数据库操作失败，消息取消

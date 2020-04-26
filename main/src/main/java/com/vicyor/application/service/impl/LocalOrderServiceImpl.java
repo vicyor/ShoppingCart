@@ -27,21 +27,17 @@ public class LocalOrderServiceImpl implements LocalOrderService {
     private ShoppingSKUService shoppingSKUService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
+    @Autowired
+    private ShoppingUtil shoppingUtil;
     @Override
     public void verifySKUOrderDTOLists(List<SKUOrderDTO> dtos) throws Exception {
         for (SKUOrderDTO dto : dtos) {
-
             Long skuId = dto.getSkuId();
             //根据商品id获取商品
             ShoppingSKU sku = shoppingSKUService.getSKUBySKUId(skuId);
             //商品库存不足
             if (sku.getStock() - dto.getCount() < 0) {
                 throw new InsufficientInventoryException(sku.getGoodsName());
-            }
-            //商品版本出现变更
-            if (sku.getVersion() != dto.getVersion()) {
-                throw new VersionException(sku.getGoodsName());
             }
         }
     }
@@ -73,14 +69,14 @@ public class LocalOrderServiceImpl implements LocalOrderService {
         //发送创建订单信息
         Map<String, Object> order = new HashMap<>();
         order.put("data", dtos);
-        order.put("userId", ShoppingUtil.getShoppingUser().getId());
+        order.put("userId", shoppingUtil.getShoppingUser().getId());
         order.put("orderId", UUID.randomUUID());
         rabbitTemplate.convertAndSend("order", "shopping.order.create", order);
 
         //发送清除购物车信息
         Map<String, Object> shoppingCart = new HashMap<>();
         shoppingCart.put("data", dtos);
-        shoppingCart.put("userId", ShoppingUtil.getShoppingUser().getId());
+        shoppingCart.put("userId", shoppingUtil.getShoppingUser().getId());
         rabbitTemplate.convertAndSend("shopping-cart", "shopping.shoppingcart.empty", shoppingCart);
     }
 }

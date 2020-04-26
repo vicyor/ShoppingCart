@@ -6,4 +6,6 @@ public interface ShoppingUserService{
     Long getUserIdByUsername(String username);
 
     ShoppingUser findUserByUsername(String username);
+
+    boolean isExistUser(String username);
 }

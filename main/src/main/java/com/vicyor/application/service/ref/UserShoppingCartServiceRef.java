@@ -41,4 +41,9 @@ public class UserShoppingCartServiceRef implements UserShoppingCartService {
     public void restoreUserShoppingCart(Long userId, List shoppingOrderSKUS) {
         userShoppingCartService.restoreUserShoppingCart(userId,shoppingOrderSKUS);
     }
+
+    @Override
+    public void updateUserShoppingCarts( Long userId, List uCarts) {
+        userShoppingCartService.updateUserShoppingCarts (userId,uCarts);
+    }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vicyor.application.dto.SKUOrderDTO;
 import com.vicyor.application.po.ShoppingOrder;
 import com.vicyor.application.po.ShoppingOrderSKU;
+import com.vicyor.application.po.ShoppingSKU;
 import com.vicyor.application.repository.ShoppingOrderRepository;
 import com.vicyor.application.repository.ShoppingOrderSKURepository;
 import com.vicyor.application.service.OrderService;
@@ -46,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
                 String json = mapper.writeValueAsString(obj);
                 SKUOrderDTO dto = mapper.readValue(json, SKUOrderDTO.class);
                 //将ShoppingOrderSKU数据持久化
-                ShoppingOrderSKU sku = new ShoppingOrderSKU(shoppingOrder.getId(), dto.getSkuId(), dto.getCount());
+                ShoppingOrderSKU sku = new ShoppingOrderSKU(shoppingOrder.getId(), new ShoppingSKU(dto.getSkuId()), dto.getCount());
                 shoppingOrderSKURepository.save(sku);
             }
         } catch (JsonProcessingException e) {
@@ -77,6 +78,20 @@ public class OrderServiceImpl implements OrderService {
     public List<ShoppingOrderSKU> getShoppingOrderSKU(String orderId) {
         List<ShoppingOrderSKU> orderSKUList = shoppingOrderSKURepository.findAllByOrderIdEquals(orderId);
         return orderSKUList;
+    }
+
+    @Override
+    public List<ShoppingOrder> listOrdersByUserId(Long userId) {
+        return shoppingOrderRepository.findAllByUserIdEquals(userId);
+    }
+
+    @Override
+    public void deleteOrderByOrderId(String orderId) {
+        //删除订单
+        shoppingOrderRepository.deleteById(orderId);
+        //删除订单商品表
+        List<ShoppingOrderSKU> soss = shoppingOrderSKURepository.findAllByOrderIdEquals(orderId);
+        shoppingOrderSKURepository.deleteAll(soss);
     }
 
 }

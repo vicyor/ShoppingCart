@@ -1,9 +1,9 @@
 package com.vicyor.application.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vicyor.application.po.ShoppingSKU;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ShoppingSKUService {
     //根据商品id获取商品的库存
@@ -14,4 +14,6 @@ public interface ShoppingSKUService {
     Boolean countDownSKUStock(Long skuId, Long count);
 
     void restoreGoodsStock(String orderId, List  shoppingOrderSKUS) throws  Exception;
+
+    Map<String, Object> getSkus(Integer from, Integer size);
 }

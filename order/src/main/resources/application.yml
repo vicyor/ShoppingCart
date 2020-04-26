@@ -22,7 +22,7 @@ spring:
     password: guest
     publisher-confirms: true
   datasource:
-    url: jdbc:mysql://linux:3306/shopping?serverTimezone=GMT+8
+    url: jdbc:mysql://linux:3306/shopping?serverTimezone=UTC
     username: root
     password: 123456
   jpa:

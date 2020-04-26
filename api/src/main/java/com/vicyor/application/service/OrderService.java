@@ -12,4 +12,8 @@ public interface OrderService {
     void cancelOrderIfNecessary(String orderId,Long userId) throws Exception;
 
     List<ShoppingOrderSKU> getShoppingOrderSKU(String orderId);
+
+    List<ShoppingOrder> listOrdersByUserId(Long userId);
+
+    void deleteOrderByOrderId(String orderId);
 }

@@ -23,4 +23,9 @@ public class LocalUserServiceImpl implements ShoppingUserService {
     public ShoppingUser findUserByUsername(String username) {
         return shoppingUserRepository.findUserByUsername(username);
     }
+
+    @Override
+    public boolean isExistUser(String username) {
+        return shoppingUserRepository.existsByUserName(username)>0;
+    }
 }

@@ -1,7 +1,7 @@
 server:
   port: 80
   servlet:
-    context-path: /shopping
+    context-path: /
 spring:
   thymeleaf:
     cache: false
@@ -38,3 +38,6 @@ dubbo:
   protocol:
     name: dubbo
     port: 20880
+jwt:
+  secret: vicyor
+  expiration: 7200000  #2小时

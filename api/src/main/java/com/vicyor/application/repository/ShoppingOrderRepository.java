@@ -18,4 +18,5 @@ public interface ShoppingOrderRepository extends JpaRepository<ShoppingOrder, St
     @Query(value = "update shopping_order set status = ?2 where id= ?1 ",nativeQuery = true)
     void updateOrderStatus(@Param("orderId") String orderId,@Param("status") Integer status);
 
+    List<ShoppingOrder> findAllByUserIdEquals(Long userId);
 }
